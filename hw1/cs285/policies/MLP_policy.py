@@ -114,19 +114,11 @@ class MLPPolicySL(MLPPolicy):
             adv_n=None, acs_labels_na=None, qvals=None
     ):
         # TODO: update the policy and return the loss
-        if self.discrete:
-            # self.logits_na.train()
-            predict = self.logits_na(ptu.from_numpy(observations))
-        else:
-            # self.mean_net.train()
-            predict = self.mean_net(ptu.from_numpy(observations))
-
-        loss = self.loss(predict, ptu.from_numpy(actions))
 
         self.optimizer.zero_grad()
+        loss = self.loss(self.forward(ptu.from_numpy(observations)), ptu.from_numpy(actions))
         loss.backward()
         self.optimizer.step()
-
 
         return {
             # You can add extra logging information here, but keep this line
