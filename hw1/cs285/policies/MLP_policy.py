@@ -81,7 +81,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             observation = ptu.from_numpy(obs[None])
 
         # TODO return the action that the policy prescribes
-        return ptu.to_numpy(self.forward(observation).sample())
+        return ptu.to_numpy(self.forward(observation))
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
@@ -95,24 +95,24 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor) -> Any:
         # To do
-        # if self.discrete:
-        #     return self.logits_na(observation)
-        # else:
-        #     return self.mean_net(observation)
         if self.discrete:
-            logits = self.logits_na(observation)
-            action_distribution = distributions.Categorical(logits=logits)
-            return action_distribution
+            return self.logits_na(observation)
         else:
-            batch_mean = self.mean_net(observation)
-            scale_tril = torch.diag(torch.exp(self.logstd))
-            batch_dim = batch_mean.shape[0]
-            batch_scale_tril = scale_tril.repeat(batch_dim, 1, 1)
-            action_distribution = distributions.MultivariateNormal(
-                batch_mean,
-                scale_tril=batch_scale_tril,
-            )
-            return action_distribution
+            return self.mean_net(observation)
+        # if self.discrete:
+        #     logits = self.logits_na(observation)
+        #     action_distribution = distributions.Categorical(logits=logits)
+        #     return action_distribution
+        # else:
+        #     batch_mean = self.mean_net(observation)
+        #     scale_tril = torch.diag(torch.exp(self.logstd))
+        #     batch_dim = batch_mean.shape[0]
+        #     batch_scale_tril = scale_tril.repeat(batch_dim, 1, 1)
+        #     action_distribution = distributions.MultivariateNormal(
+        #         batch_mean,
+        #         scale_tril=batch_scale_tril,
+        #     )
+        #     return action_distribution
 
 #####################################################
 #####################################################
@@ -127,11 +127,13 @@ class MLPPolicySL(MLPPolicy):
             adv_n=None, acs_labels_na=None, qvals=None
     ):
         # TODO: update the policy and return the loss
-        pred = self.forward(ptu.from_numpy(observations)).sample()
-        loss = self.loss(pred, ptu.from_numpy(actions))
-
         self.optimizer.zero_grad()
-        loss.requires_grad_(True)
+
+        pred = self.forward(ptu.from_numpy(observations))
+        target = ptu.from_numpy(actions)
+        loss = self.loss(pred, target)
+        # loss.requires_grad_(True)
+        
         loss.backward()
         self.optimizer.step()
 
