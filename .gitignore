@@ -1,4 +1,5 @@
 *.pyc
+*.out
 data/
 *.DS_Store
 *~
