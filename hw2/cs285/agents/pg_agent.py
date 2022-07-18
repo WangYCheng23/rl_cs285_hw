@@ -169,11 +169,15 @@ class PGAgent(BaseAgent):
 
         # TODO: create list_of_discounted_returns
         list_of_discounted_returns = []
-        for traj in rewards:
-            gamma_vec = np.logspace(0, len(traj)-1, num = len(traj), base=self.gamma, dtype=np.float32).reshape(-1,1)
-            # gamma_matrix = np.tile(gamma_vec, (len(traj), 1))
-            list_of_discounted_returns.append(np.matmul(gamma_vec.transpose(), traj).item())
-        return np.array(list_of_discounted_returns)
+        for eps_rewards in rewards:
+            T = len(eps_rewards)
+            gamma_matrix = []
+            for _ in range(T):
+                gamma_vec = np.logspace(0, T-1, num=T, base=self.gamma, dtype=np.float32).reshape(-1,1)
+                gamma_matrix.append(gamma_vec)
+            gamma_matrix = np.array(gamma_matrix).reshape(T,T)
+            list_of_discounted_returns.append(np.matmul(gamma_matrix, eps_rewards).tolist())
+        return np.array(sum(list_of_discounted_returns,[]))
 
     def _discounted_cumsum(self, rewards):
         """
@@ -185,12 +189,22 @@ class PGAgent(BaseAgent):
         # TODO: create `list_of_discounted_returns`
         # HINT: it is possible to write a vectorized solution, but a solution
             # using a for loop is also fine
-        T = len(rewards)
-        gamma_matrix = np.empty((T,1))
-        for i, r in enumerate(rewards):
-            gamma_vec = shift(np.logspace(0, T-1, num = T, base=self.gamma), i, cval=0)
-            gamma_matrix = np.row_stack((gamma_matrix, gamma_vec))
+        # T = len(rewards)
+        # gamma_matrix = np.empty((T,1))
+        # for i, r in enumerate(rewards):
+        #     gamma_vec = shift(np.logspace(0, T-1, num = T, base=self.gamma), i, cval=0)
+        #     gamma_matrix = np.row_stack((gamma_matrix, gamma_vec))
 
-        list_of_discounted_cumsums = np.matmul(gamma_matrix,rewards)
+        # list_of_discounted_cumsums = np.matmul(gamma_matrix,rewards)
 
-        return list_of_discounted_cumsums
+        # return list_of_discounted_cumsums
+        list_of_discounted_returns = []
+        for eps_rewards in rewards:
+            T = len(eps_rewards)
+            gamma_matrix = []
+            for s in range(T):
+                gamma_vec = shift(np.logspace(0, T-1, num=T, base=self.gamma, dtype=np.float32), s, cval=0)
+                gamma_matrix.append(gamma_vec)
+            gamma_matrix = np.array(gamma_matrix).reshape(T,T)
+            list_of_discounted_returns.append(np.matmul(gamma_matrix, eps_rewards).tolist())
+        return np.array(sum(list_of_discounted_returns,[]))
