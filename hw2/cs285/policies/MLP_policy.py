@@ -91,10 +91,7 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
             observation = ptu.from_numpy(obs)
         else:
             observation = ptu.from_numpy(obs[None])
-
-        with torch.no_grad():
-            t_res = self.forward(observation)
-            return ptu.to_numpy(t_res.sample())
+        return ptu.to_numpy(self.forward(observation).sample())
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
@@ -156,8 +153,11 @@ class MLPPolicyPG(MLPPolicy):
                 ## updating the baseline. Remember to 'zero_grad' first
             ## HINT2: You will need to convert the targets into a tensor using
                 ## ptu.from_numpy before using it in the loss
+            baseline_loss = self.baseline_loss(self.baseline(observations), ptu.from_numpy(q_values))
 
-            TODO
+            self.baseline_optimizer.zero_grad()
+            baseline_loss.backward()
+            self.baseline_optimizer.step()
 
         self.optimizer.zero_grad()
         loss.backward()

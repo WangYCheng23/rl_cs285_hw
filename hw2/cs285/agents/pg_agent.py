@@ -1,6 +1,6 @@
 import numpy as np
 import torch.nn.functional
-from scipy.ndimage.interpolation import shift
+from scipy.ndimage import shift
 
 from .base_agent import BaseAgent
 from cs285.policies.MLP_policy import MLPPolicyPG
@@ -125,7 +125,11 @@ class PGAgent(BaseAgent):
                         ## 0 otherwise.
                     ## HINT 2: self.gae_lambda is the lambda value in the
                         ## GAE formula
-                    pass
+                    if terminals[i]==1:
+                        advantages[i] = rews[i] - values[i]
+                    else:
+                        advantages[i] = rews[i]+self.gamma*values[i+1]-values[i]
+                        advantages[i] += self.gamma*self.gae_lambda*advantages[i+1]
                 # remove dummy advantage
                 advantages = advantages[:-1]
 
