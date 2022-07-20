@@ -47,22 +47,23 @@ class DQNAgent(object):
         # HINT: the replay buffer used here is `MemoryOptimizedReplayBuffer`
             # in dqn_utils.py
         self.replay_buffer_idx = self.replay_buffer.next_idx
+        self.replay_buffer.store_frame(self.last_obs)
 
         eps = self.exploration.value(self.t)
 
         # TODO use epsilon greedy exploration when selecting action
-        perform_random_action = eps
+        perform_random_action = np.random.random() < eps
         if perform_random_action:
             # HINT: take random action 
                 # with probability eps (see np.random.random())
                 # OR if your current step number (see self.t) is less that self.learning_starts
-            action = np.random.random(self.num_actions)
+            action = self.env.action_space.sample()
         else:
             # HINT: Your actor will take in multiple previous observations ("frames") in order
                 # to deal with the partial observability of the environment. Get the most recent 
                 # `frame_history_len` observations using functionality from the replay buffer,
                 # and then use those observations as input to your actor. 
-            obs = self.replay_buffer
+            obs = self.replay_buffer.encode_recent_observation()
             action = self.actor(obs)
         
         # TODO take a step in the environment using the action from the policy
@@ -74,7 +75,9 @@ class DQNAgent(object):
         # TODO store the result of taking this action into the replay buffer
         # HINT1: see your replay buffer's `store_effect` function
         # HINT2: one of the arguments you'll need to pass in is self.replay_buffer_idx from above
-        self.replay_buffer.store_effect(action, reward, done)
+        # self.replay_buffer.store_frame(ob)
+        self.replay_buffer.store_effect(self.replay_buffer_idx, action, reward, done)
+        self.last_obs = ob
 
         # TODO if taking this step resulted in done, reset the env (and the latest observation)
         if done:
