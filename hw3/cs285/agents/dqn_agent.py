@@ -64,7 +64,7 @@ class DQNAgent(object):
                 # `frame_history_len` observations using functionality from the replay buffer,
                 # and then use those observations as input to your actor. 
             obs = self.replay_buffer.encode_recent_observation()
-            action = self.actor(obs)
+            action = self.actor.get_action(obs)
         
         # TODO take a step in the environment using the action from the policy
         # HINT1: remember that self.last_obs must always point to the newest/latest observation
@@ -99,13 +99,13 @@ class DQNAgent(object):
 
             # TODO fill in the call to the update function using the appropriate tensors
             log = self.critic.update(
-                TODO
+                ob_no, ac_na, next_ob_no, re_n, terminal_n
             )
 
             # TODO update the target network periodically 
             # HINT: your critic already has this functionality implemented
             if self.num_param_updates % self.target_update_freq == 0:
-                TODO
+                self.critic.q_net_target = self.critic.q_net
 
             self.num_param_updates += 1
 
