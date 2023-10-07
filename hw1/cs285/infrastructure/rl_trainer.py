@@ -3,6 +3,7 @@ from collections import OrderedDict
 import numpy as np
 import time
 
+import os
 import gym
 import torch
 
@@ -164,7 +165,7 @@ class RL_Trainer(object):
                 # (2) collect `self.params['batch_size']` transitions
         if itr == 0:
             try:
-                with open(load_initial_expertdata, "rb") as ld_file:
+                with open(os.path.join(os.getcwd(),load_initial_expertdata), "rb") as ld_file:
                     paths = pickle.load(ld_file)
             except:
                 raise FileExistsError('You need to provide a valid filename for the policy')

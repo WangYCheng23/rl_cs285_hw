@@ -6,7 +6,6 @@ root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-3])
 sys.path.append(root_path)
 
-
 from cs285.infrastructure.rl_trainer import RL_Trainer
 from cs285.agents.bc_agent import BCAgent
 from cs285.policies.loaded_gaussian_policy import LoadedGaussianPolicy
