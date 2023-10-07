@@ -28,9 +28,11 @@ def read_layer(l):
 class LoadedGaussianPolicy(BasePolicy, nn.Module):
     def __init__(self, filename, **kwargs):
         super().__init__(**kwargs)
-
-        with open(filename, 'rb') as f:
-            data = pickle.loads(f.read())
+        try:
+            with open(filename, 'rb') as f:
+                data = pickle.loads(f.read())
+        except:
+            raise FileExistsError('You need to provide a valid filename for the policy')
 
         self.nonlin_type = data['nonlin_type']
         if self.nonlin_type == 'lrelu':

@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "hw1-BC",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/hw1",
+            "program": "${workspaceFolder}/hw1/cs285/scripts/run_hw1.py",
+            "args": [
+                "--expert_policy_file", "/hw1/cs285/policies/experts/Ant.pkl", 
+                "--env_name", "Ant-v2", "--exp_name", "bc_ant", "--n_iter", "1",
+                "--expert_data", "/hw1/cs285/expert_data/expert_data_Ant-v2.pkl ",
+                "--ep_len", "1000", "--eval_batch_size", "5000",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        }
+    ]
+}

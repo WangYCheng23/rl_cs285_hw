@@ -163,8 +163,11 @@ class RL_Trainer(object):
 
                 # (2) collect `self.params['batch_size']` transitions
         if itr == 0:
-            with open(load_initial_expertdata, "rb") as ld_file:
-                paths = pickle.load(ld_file)
+            try:
+                with open(load_initial_expertdata, "rb") as ld_file:
+                    paths = pickle.load(ld_file)
+            except:
+                raise FileExistsError('You need to provide a valid filename for the policy')
             return paths, 0, None
 
         # TODO collect `batch_size` samples to be used for training
