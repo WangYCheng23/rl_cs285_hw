@@ -1,5 +1,10 @@
 import os
+import sys
 import time
+
+root_path = os.path.abspath(__file__)
+root_path = '/'.join(root_path.split('/')[:-3])
+sys.path.insert(0, root_path)
 
 from cs285.agents.ac_agent import ACAgent
 from cs285.infrastructure.rl_trainer import RL_Trainer
