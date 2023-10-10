@@ -5,6 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "hw2-PG",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/hw2/",
+            "program": "${workspaceFolder}/hw2/cs285/scripts/run_hw2.py",
+            "args": [
+                //CarPole
+                "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-dsa", "--exp_name", "q1_sb_no_rtg_dsa"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "hw1-DAgger",
             "type": "python",
             "request": "launch",
