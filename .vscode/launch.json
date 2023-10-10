@@ -11,8 +11,18 @@
             "cwd": "${workspaceFolder}/hw2/",
             "program": "${workspaceFolder}/hw2/cs285/scripts/run_hw2.py",
             "args": [
-                //CarPole
-                "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-dsa", "--exp_name", "q1_sb_no_rtg_dsa"
+                // //CarPole-q1_sb_no_rtg_dsa
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-dsa", "--exp_name", "q1_sb_no_rtg_dsa"
+                // //CarPole-q1_sb_rtg_dsa
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-rtg", "-dsa", "--exp_name", "q1_sb_rtg_dsa"
+                // //CarPole-q1_sb_rtg_na
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-rtg", "--exp_name", "q1_sb_rtg_na"
+                //CarPole-q1_lb_no_rtg_dsa
+                "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-dsa", "--exp_name", "q1_lb_no_rtg_dsa"
+                // //CarPole-q1_lb_rtg_dsa
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-rtg", "-dsa", "--exp_name", "q1_lb_rtg_dsa"
+                // //CarPole-q1_lb_rtg_na
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-rtg", "--exp_name", "q1_lb_rtg_na"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
