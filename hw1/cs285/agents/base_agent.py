@@ -1,3 +1,4 @@
+
 class BaseAgent(object):
     def __init__(self, **kwargs):
         super(BaseAgent, self).__init__(**kwargs)

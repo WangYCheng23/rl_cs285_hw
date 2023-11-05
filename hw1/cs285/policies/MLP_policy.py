@@ -76,17 +76,18 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
     def get_action(self, obs: np.ndarray) -> np.ndarray:
         if len(obs.shape) > 1:
-            observation = ptu.from_numpy(obs)
+            observation = obs
         else:
-            observation = ptu.from_numpy(obs[None])
+            observation = obs[None]
 
-        # TODO return the action that the policy prescribes
-        return ptu.to_numpy(self.forward(observation))
+        # [Solved] return the action that the policy prescribes
+        distribution = self.forward(ptu.from_numpy(observation.astype(np.float32)))
+        action = distribution.sample()
+        return ptu.to_numpy(action)
 
     # update/train this policy
     def update(self, observations, actions, **kwargs):
         raise NotImplementedError
-
 
     # This function defines the forward pass of the network.
     # You can return anything you want, but you should be able to differentiate
@@ -94,25 +95,20 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
     # return more flexible objects, such as a
     # `torch.distributions.Distribution` object. It's up to you!
     def forward(self, observation: torch.FloatTensor) -> Any:
-        # To do
         if self.discrete:
-            return self.logits_na(observation)
+            logits = self.logits_na(observation)
+            action_distribution = distributions.Categorical(logits=logits)
+            return action_distribution
         else:
-            return self.mean_net(observation)
-        # if self.discrete:
-        #     logits = self.logits_na(observation)
-        #     action_distribution = distributions.Categorical(logits=logits)
-        #     return action_distribution
-        # else:
-        #     batch_mean = self.mean_net(observation)
-        #     scale_tril = torch.diag(torch.exp(self.logstd))
-        #     batch_dim = batch_mean.shape[0]
-        #     batch_scale_tril = scale_tril.repeat(batch_dim, 1, 1)
-        #     action_distribution = distributions.MultivariateNormal(
-        #         batch_mean,
-        #         scale_tril=batch_scale_tril,
-        #     )
-        #     return action_distribution
+            batch_mean = self.mean_net(observation)
+            scale_tril = torch.diag(torch.exp(self.logstd))
+            batch_dim = batch_mean.shape[0]
+            batch_scale_tril = scale_tril.repeat(batch_dim, 1, 1)
+            action_distribution = distributions.MultivariateNormal(
+                batch_mean,
+                scale_tril=batch_scale_tril,
+            )
+            return action_distribution
 
 #####################################################
 #####################################################
@@ -126,17 +122,14 @@ class MLPPolicySL(MLPPolicy):
             self, observations, actions,
             adv_n=None, acs_labels_na=None, qvals=None
     ):
-        # TODO: update the policy and return the loss
+        # [Solved] update the policy and return the loss
+        observations = ptu.from_numpy(observations)
+        actions = ptu.from_numpy(actions)
+        predict_actions = self.forward(observations).sample()
+        loss = self.loss(predict_actions, actions)
         self.optimizer.zero_grad()
-
-        pred = self.forward(ptu.from_numpy(observations))
-        target = ptu.from_numpy(actions)
-        loss = self.loss(pred, target)
-        # loss.requires_grad_(True)
-        
         loss.backward()
         self.optimizer.step()
-
         return {
             # You can add extra logging information here, but keep this line
             'Training Loss': ptu.to_numpy(loss),

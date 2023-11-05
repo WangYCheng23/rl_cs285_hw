@@ -12,7 +12,7 @@
             "program": "${workspaceFolder}/hw2/cs285/scripts/run_hw2.py",
             "args": [
                 // //CarPole-q1_sb_no_rtg_dsa
-                // "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-dsa", "--exp_name", "q1_sb_no_rtg_dsa"
+                // "--env_name", "CartPole-v1", "-n", "100", "-b", "1000", "-dsa", "--exp_name", "q1_sb_no_rtg_dsa"
                 // //CarPole-q1_sb_rtg_dsa
                 // "--env_name", "CartPole-v0", "-n", "100", "-b", "1000", "-rtg", "-dsa", "--exp_name", "q1_sb_rtg_dsa"
                 // //CarPole-q1_sb_rtg_na
@@ -22,7 +22,52 @@
                 // //CarPole-q1_lb_rtg_dsa
                 // "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-rtg", "-dsa", "--exp_name", "q1_lb_rtg_dsa"
                 //CarPole-q1_lb_rtg_na
-                "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-rtg", "--exp_name", "q1_lb_rtg_na"
+                // "--env_name", "CartPole-v0", "-n", "100", "-b", "5000", "-rtg", "--exp_name", "q1_lb_rtg_na", "--video_log_freq", "10"
+
+                // //InvertedPendulum-q2_b_1000_r_1
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "1000", "-lr", "1", "-rtg", "--exp_name", "q2_b_1000_r_1"
+                // //InvertedPendulum-q2_b_1000_r_1e-2
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "1000", "-lr", "1e-2", "-rtg", "--exp_name", "q2_b_1000_r_1e-2"
+                // //InvertedPendulum-q2_b_1000_r_5e-3
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "1000", "-lr", "5e-3", "-rtg", "--exp_name", "q2_b_1000_r_5e-3"
+                // //InvertedPendulum-q2_b_1000_r_1e-3
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "1000", "-lr", "1e-3", "-rtg", "--exp_name", "q2_b_1000_r_1e-3"
+                
+                // // InvertedPendulum-q2_b_5000_r_1e-3
+                //  "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "5000", "-lr", "1e-3", "-rtg", "--exp_name", "q2_b_5000_r_1e-3"
+                // //InvertedPendulum-q2_b_500_r_1e-3
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "500", "-lr", "1e-3", "-rtg", "--exp_name", "q2_b_500_r_1e-3"
+                // //InvertedPendulum-q2_b_5000_r_1e-1
+                // "--env_name", "InvertedPendulum-v2", "--ep_len", "1000", "--discount", "0.9", "-n", "100", "-l", "2", "-s", "64", "-b", "5000", "-lr", "1e-1", "-rtg", "--exp_name", "q2_b_5000_r_1e-1"
+            
+                // // LunarLanderContinuous-q3_b40000_r0.005
+                // "--env_name", "LunarLanderContinuous-v2", "--ep_len", "1000", "--discount", "0.99", "-n", "100", "-l", "2", "-s", "64", "-b", "40000", "-lr", "0.005", "--reward_to_go", "--nn_baseline", "--exp_name", "q3_b40000_r0.005"
+                
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "1000", "-lr", "0.005", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_1000_lr_0.005_rtg_nnbaseline", "--video_log_freq", "20"              
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "1000", "-lr", "0.01", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_1000_lr_0.01_rtg_nnbaseline", "--video_log_freq", "20"                  
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "1000", "-lr", "0.02", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_1000_lr_0.02_rtg_nnbaseline", "--video_log_freq", "20"                 
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "3000", "-lr", "0.005", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_3000_lr_0.005_rtg_nnbaseline", "--video_log_freq", "20"               
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "3000", "-lr", "0.01", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_3000_lr_0.01_rtg_nnbaseline", "--video_log_freq", "20"                  
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "3000", "-lr", "0.02", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_3000_lr_0.02_rtg_nnbaseline", "--video_log_freq", "20"                  
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "5000", "-lr", "0.005", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_5000_lr_0.005_rtg_nnbaseline", "--video_log_freq", "20"  
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "5000", "-lr", "0.01", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_5000_lr_0.01_rtg_nnbaseline", "--video_log_freq", "20"         
+                // HalfCheetah-q4
+                // "--env_name", "HalfCheetah-v4", "--ep_len", "150", "--discount", "0.95", "-n", "100", "-l", "2", "-s", "32", "-b", "5000", "-lr", "0.02", "-rtg", "--nn_baseline", "--exp_name", "q4_search_b_5000_lr_0.02_rtg_nnbaseline", "--video_log_freq", "20"  
+                
+                // HopperV4
+                // "--env_name", "Hopper-v4", "--ep_len", "1000", "--discount", "0.99", "-n", "300", "-l", "2", "-s", "32", "-b", "2000", "-lr", "0.001", "--reward_to_go", "--nn_baseline", "--action_noise_std", "0.5", "--gae_lambda", "0", "--exp_name", "q5_b2000_r0.001_lambda_0"
+                "--env_name", "Hopper-v4", "--ep_len", "1000", "--discount", "0.99", "-n", "300", "-l", "2", "-s", "32", "-b", "2000", "-lr", "0.001", "--reward_to_go", "--nn_baseline", "--action_noise_std", "0.5", "--gae_lambda", "0.95", "--exp_name", "q5_b2000_r0.001_lambda_0.95"
+                // "--env_name", "Hopper-v4", "--ep_len", "1000", "--discount", "0.99", "-n", "300", "-l", "2", "-s", "32", "-b", "2000", "-lr", "0.001", "--reward_to_go", "--nn_baseline", "--action_noise_std", "0.5", "--gae_lambda", "0.98", "--exp_name", "q5_b2000_r0.001_lambda_0.98"
+                // "--env_name", "Hopper-v4", "--ep_len", "1000", "--discount", "0.99", "-n", "300", "-l", "2", "-s", "32", "-b", "2000", "-lr", "0.001", "--reward_to_go", "--nn_baseline", "--action_noise_std", "0.5", "--gae_lambda", "0.99", "--exp_name", "q5_b2000_r0.001_lambda_0.99"
+                // "--env_name", "Hopper-v4", "--ep_len", "1000", "--discount", "0.99", "-n", "300", "-l", "2", "-s", "32", "-b", "2000", "-lr", "0.001", "--reward_to_go", "--nn_baseline", "--action_noise_std", "0.5", "--gae_lambda", "1", "--exp_name", "q5_b2000_r0.001_lambda_1"
             ],
             "console": "integratedTerminal",
             "justMyCode": false
@@ -37,14 +82,14 @@
                 "--expert_policy_file",
                 "cs285/policies/experts/Ant.pkl",
                 "--env_name",
-                "Ant-v2",
+                "Ant-v4",
                 "--exp_name",
                 "dagger_ant",
                 "--n_iter",
                 "10",
                 "--do_dagger",
                 "--expert_data",
-                "cs285/expert_data/expert_data_Ant-v2.pkl",
+                "cs285/expert_data/expert_data_Ant-v4.pkl",
                 "--ep_len",
                 "1000",
                 "--eval_batch_size",
@@ -63,13 +108,13 @@
                 "--expert_policy_file",
                 "cs285/policies/experts/Ant.pkl",
                 "--env_name",
-                "Ant-v2",
+                "Ant-v4",
                 "--exp_name",
                 "bc_ant",
                 "--n_iter",
                 "1",
                 "--expert_data",
-                "cs285/expert_data/expert_data_Ant-v2.pkl",
+                "cs285/expert_data/expert_data_Ant-v4.pkl",
                 "--ep_len",
                 "1000",
                 "--eval_batch_size",

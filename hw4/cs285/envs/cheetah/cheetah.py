@@ -1,14 +1,26 @@
 import numpy as np
-import mujoco_py
 from gym import utils
 from gym.envs.mujoco import mujoco_env
+from gym.spaces import Box
 
 class HalfCheetahEnv(mujoco_env.MujocoEnv, utils.EzPickle):
+    metadata = {
+        "render_modes": [
+            "human",
+            "rgb_array",
+            "depth_array",
+            "single_rgb_array",
+            "single_depth_array",
+        ],
+        "render_fps": 100,
+    }
 
-    def __init__(self):
+    def __init__(self, **kwargs):
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(21,), dtype=np.float64)
+        
 
-        mujoco_env.MujocoEnv.__init__(self, 'half_cheetah.xml', 1)
-        utils.EzPickle.__init__(self)
+        mujoco_env.MujocoEnv.__init__(self, 'half_cheetah.xml', 1, observation_space=observation_space, **kwargs)
+        utils.EzPickle.__init__(self, **kwargs)
 
         self.skip = self.frame_skip
 
@@ -99,10 +111,9 @@ class HalfCheetahEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return ob, rew, done, env_info
 
     def _get_obs(self):
-
         self.obs_dict = {}
-        self.obs_dict['joints_pos'] = self.sim.data.qpos.flat.copy()
-        self.obs_dict['joints_vel'] = self.sim.data.qvel.flat.copy()
+        self.obs_dict['joints_pos'] = self.data.qpos.flat.copy()
+        self.obs_dict['joints_vel'] = self.data.qvel.flat.copy()
         self.obs_dict['com_torso'] = self.get_body_com("torso").flat.copy()
 
         return np.concatenate([
@@ -131,3 +142,8 @@ class HalfCheetahEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         #return
         return self._get_obs()
+    
+    def render(self,):
+        ren = super().render()
+        self.renderer.render_step()
+        return ren

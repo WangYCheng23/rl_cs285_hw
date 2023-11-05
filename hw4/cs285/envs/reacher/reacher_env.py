@@ -1,26 +1,40 @@
 import numpy as np
 from gym import utils
 from gym.envs.mujoco import mujoco_env
-from mujoco_py import MjViewer
 import os
+from gym.spaces import Box
+import mujoco
 
 class Reacher7DOFEnv(mujoco_env.MujocoEnv, utils.EzPickle):
-    def __init__(self):
+    metadata = {
+        "render_modes": [
+            "human",
+            "rgb_array",
+            "depth_array",
+            "single_rgb_array",
+            "single_depth_array",
+        ],
+        "render_fps": 50,
+    }
+    def __init__(self, **kwargs):
 
+        observation_space = Box(low=-np.inf, high=np.inf, shape=(20,), dtype=np.float64)
         # placeholder
         self.hand_sid = -2
         self.target_sid = -1
 
         curr_dir = os.path.dirname(os.path.abspath(__file__))
-        mujoco_env.MujocoEnv.__init__(self, curr_dir+'/assets/sawyer.xml', 2)
+        mujoco_env.MujocoEnv.__init__(self, curr_dir+'/assets/sawyer.xml', 2, observation_space=observation_space, **kwargs)
         utils.EzPickle.__init__(self)
-        self.observation_dim = 26
+        self.observation_dim = 20
         self.action_dim = 7
 
-        self.hand_sid = self.model.site_name2id("finger")
-        self.target_sid = self.model.site_name2id("target")
+        self.hand_sid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, 'finger')
+        self.target_sid = mujoco.mj_name2id(self.model, mujoco.mjtObj.mjOBJ_SITE, 'target')
         self.skip = self.frame_skip
-
+        if self.render_mode == "rgb_array":
+            super().render()
+            self.renderer.render_step()
 
     def _get_obs(self):
         return np.concatenate([
@@ -89,7 +103,7 @@ class Reacher7DOFEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             return self.reward_dict['r_total'][0], dones[0]
         return self.reward_dict['r_total'], dones
 
-    def reset(self):
+    def reset(self, **kwargs):
         _ = self.reset_model()
 
         self.model.site_pos[self.target_sid] = [0.1, 0.1, 0.1]
@@ -120,7 +134,11 @@ class Reacher7DOFEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #reset target
         self.reset_goal = reset_goal.copy()
         self.model.site_pos[self.target_sid] = self.reset_goal
-        self.sim.forward()
 
         #return
         return self._get_obs()
+
+    def render(self,):
+        ren = super().render()
+        self.renderer.render_step()
+        return [ren[0]]

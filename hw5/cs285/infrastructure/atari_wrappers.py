@@ -2,6 +2,9 @@ import numpy as np
 import gym
 from gym import spaces
 
+class ReturnWrapper(gym.Wrapper):
+    def get_episode_rewards(self):
+        return list(self.env.return_queue)
 
 class NoopResetEnv(gym.Wrapper):
     def __init__(self, env, noop_max=30):

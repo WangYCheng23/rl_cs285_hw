@@ -78,18 +78,19 @@ class CQLCritic(BaseCritic):
         # CQL Implementation
         # TODO: Implement CQL as described in the pdf and paper
         # Hint: After calculating cql_loss, augment the loss appropriately
-        cql_loss = None
         q_t_logsumexp = None
+        cql_loss = None
 
         info = {'Training Loss': ptu.to_numpy(loss)}
 
         # TODO: Uncomment these lines after implementing CQL
-        info['CQL Loss'] = ptu.to_numpy(cql_loss)
-        info['Data q-values'] = ptu.to_numpy(q_t_values).mean()
-        info['OOD q-values'] = ptu.to_numpy(q_t_logsumexp).mean()
+        # info['CQL Loss'] = ptu.to_numpy(cql_loss)
+        # info['Data q-values'] = ptu.to_numpy(q_t_values).mean()
+        # info['OOD q-values'] = ptu.to_numpy(q_t_logsumexp).mean()
+        
+        self.learning_rate_scheduler.step()
 
         return info
-
 
     def update_target_network(self):
         for target_param, param in zip(

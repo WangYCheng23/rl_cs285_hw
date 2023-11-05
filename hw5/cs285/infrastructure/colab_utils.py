@@ -1,4 +1,4 @@
-from gym.wrappers import Monitor
+from gym.wrappers import RecordVideo
 import glob
 import io
 import base64
@@ -19,8 +19,8 @@ def show_video():
              </video>'''.format(encoded.decode('ascii'))))
   else: 
     print("Could not find video")
-
+    
 
 def wrap_env(env):
-  env = Monitor(env, '/content/video', force=True)
+  env = RecordVideo(env, '/content/video')
   return env

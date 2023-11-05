@@ -1,5 +1,4 @@
-import os
-import sys
+import os, sys
 import time
 
 root_path = os.path.abspath(__file__)
@@ -9,7 +8,11 @@ sys.path.insert(0, root_path)
 from cs285.infrastructure.rl_trainer import RL_Trainer
 from cs285.agents.bc_agent import BCAgent
 from cs285.policies.loaded_gaussian_policy import LoadedGaussianPolicy
+from cs285.infrastructure.utils import MJ_ENV_KWARGS, MJ_ENV_NAMES
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+    
 
 class BC_Trainer(object):
 
@@ -29,6 +32,8 @@ class BC_Trainer(object):
         self.params = params
         self.params['agent_class'] = BCAgent ## HW1: you will modify this
         self.params['agent_params'] = agent_params
+
+        self.params["env_kwargs"] = MJ_ENV_KWARGS[self.params['env_name']]
 
         ################
         ## RL TRAINER
@@ -61,18 +66,17 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--expert_policy_file', '-epf', type=str, required=True)  # relative to where you're running this script from
     parser.add_argument('--expert_data', '-ed', type=str, required=True) #relative to where you're running this script from
-    parser.add_argument('--env_name', '-env', type=str, help='choices: Ant-v2, Humanoid-v2, Walker-v2, HalfCheetah-v2, Hopper-v2', required=True)
+    parser.add_argument('--env_name', '-env', type=str, help=f'choices: {", ".join(MJ_ENV_NAMES)}', required=True)
     parser.add_argument('--exp_name', '-exp', type=str, default='pick an experiment name', required=True)
     parser.add_argument('--do_dagger', action='store_true')
     parser.add_argument('--ep_len', type=int)
-    
-    # 更新多少轮一个itr
+
     parser.add_argument('--num_agent_train_steps_per_iter', type=int, default=1000)  # number of gradient steps for training policy (per iter in n_iter)
     parser.add_argument('--n_iter', '-n', type=int, default=1)
 
     parser.add_argument('--batch_size', type=int, default=1000)  # training data collected (in the env) during each iteration
     parser.add_argument('--eval_batch_size', type=int,
-                        default=200)  # eval data collected (in the env) for logging metrics
+                        default=1000)  # eval data collected (in the env) for logging metrics
     parser.add_argument('--train_batch_size', type=int,
                         default=100)  # number of sampled data points to be used per gradient/train step
 
@@ -80,7 +84,7 @@ def main():
     parser.add_argument('--size', type=int, default=64)  # width of each layer, of policy to be learned
     parser.add_argument('--learning_rate', '-lr', type=float, default=5e-3)  # LR for supervised learning
 
-    parser.add_argument('--video_log_freq', type=int, default=1)
+    parser.add_argument('--video_log_freq', type=int, default=5)
     parser.add_argument('--scalar_log_freq', type=int, default=1)
     parser.add_argument('--no_gpu', '-ngpu', action='store_true')
     parser.add_argument('--which_gpu', type=int, default=0)

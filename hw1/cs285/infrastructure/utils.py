@@ -4,7 +4,11 @@ import time
 ############################################
 ############################################
 
-def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('rgb_array')):
+MJ_ENV_NAMES = ["Ant-v4", "Walker2d-v4", "HalfCheetah-v4", "Hopper-v4"]
+MJ_ENV_KWARGS = {name: {"render_mode": "rgb_array"} for name in MJ_ENV_NAMES}
+MJ_ENV_KWARGS["Ant-v4"]["use_contact_forces"] = True
+
+def sample_trajectory(env, policy, max_path_length, render=False):
 
     # initialize env for the beginning of a new rollout
     ob = env.reset() # HINT: should be the output of resetting the env
@@ -16,14 +20,10 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
 
         # render image of the simulated env
         if render:
-            if 'rgb_array' in render_mode:
-                if hasattr(env, 'sim'):
-                    image_obs.append(env.sim.render(camera_name='track', height=500, width=500)[::-1])
-                else:
-                    image_obs.append(env.render(mode=render_mode))
-            if 'human' in render_mode:
-                env.render(mode=render_mode)
-                time.sleep(env.model.opt.timestep)
+            if hasattr(env, 'sim'):
+                image_obs.append(env.sim.render(camera_name='track', height=500, width=500)[::-1])
+            else:
+                image_obs.append(env.render())
 
         # use the most recent ob to decide what to do
         obs.append(ob)
@@ -39,9 +39,9 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
         next_obs.append(ob)
         rewards.append(rew)
 
-        # TODO end the rollout if the rollout ended
+        # [Solved] end the rollout if the rollout ended
         # HINT: rollout can end due to done, or due to max_path_length
-        rollout_done = done or (steps == max_path_length) # HINT: this is either 0 or 1
+        rollout_done = done or steps>=max_path_length # HINT: this is either 0 or 1
         terminals.append(rollout_done)
 
         if rollout_done:
@@ -49,37 +49,33 @@ def sample_trajectory(env, policy, max_path_length, render=False, render_mode=('
 
     return Path(obs, image_obs, acs, rewards, next_obs, terminals)
 
-def sample_trajectories(env, policy, min_timesteps_per_batch, max_path_length, render=False, render_mode=('rgb_array')):
+def sample_trajectories(env, policy, min_timesteps_per_batch, max_path_length, render=False):
     """
         Collect rollouts until we have collected min_timesteps_per_batch steps.
 
-        TODO implement this function
+        [Solved] implement this function
         Hint1: use sample_trajectory to get each path (i.e. rollout) that goes into paths
         Hint2: use get_pathlength to count the timesteps collected in each path
     """
     timesteps_this_batch = 0
     paths = []
     while timesteps_this_batch < min_timesteps_per_batch:
-        p = sample_trajectory(env, policy, max_path_length, render, render_mode)
-        paths.append(p)
-
-        timesteps_this_batch += get_pathlength(p)
+        paths.append(sample_trajectory(env, policy, max_path_length, render))
+        timesteps_this_batch += get_pathlength(paths[-1])
 
     return paths, timesteps_this_batch
 
-def sample_n_trajectories(env, policy, ntraj, max_path_length, render=False, render_mode=('rgb_array')):
+def sample_n_trajectories(env, policy, ntraj, max_path_length, render=False):
     """
         Collect ntraj rollouts.
 
-        TODO implement this function
+        [Solved] implement this function
         Hint1: use sample_trajectory to get each path (i.e. rollout) that goes into paths
     """
     paths = []
-    traj = 0
-    while traj < ntraj:
-        p = sample_trajectory(env, policy, max_path_length, render, render_mode)
-        paths.append(p)
-        traj += 1
+
+    for _ in range(ntraj):
+        paths.append(sample_trajectory(env, policy, max_path_length, render))
 
     return paths
 

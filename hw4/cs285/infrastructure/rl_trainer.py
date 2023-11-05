@@ -10,6 +10,7 @@ import numpy as np
 import torch
 
 from cs285.agents.mb_agent import MBAgent
+from cs285.agents.mbpo_agent import MBPOAgent
 from cs285.infrastructure import pytorch_util as ptu
 from cs285.infrastructure import utils
 from cs285.infrastructure.logger import Logger
@@ -51,18 +52,10 @@ class RL_Trainer(object):
         #############
 
         # Make the gym environment
-        self.env = gym.make(self.params['env_name'])
-        if 'env_wrappers' in self.params:
-            # These operations are currently only for Atari envs
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), force=True)
-            self.env = params['env_wrappers'](self.env)
-            self.mean_episode_reward = -float('nan')
-            self.best_mean_episode_reward = -float('inf')
-        if 'non_atari_colab_env' in self.params and self.params['video_log_freq'] > 0:
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), force=True)
-            self.mean_episode_reward = -float('nan')
-            self.best_mean_episode_reward = -float('inf')
-
+        if self.params['video_log_freq'] == -1:
+            self.env = gym.make(self.params['env_name'])
+        else:
+            self.env = gym.make(self.params['env_name'], render_mode='rgb_array')
         self.env.seed(seed)
 
         # import plotting (locally if 'obstacles' env)
@@ -89,16 +82,19 @@ class RL_Trainer(object):
         self.params['agent_params']['ac_dim'] = ac_dim
         self.params['agent_params']['ob_dim'] = ob_dim
 
+        if 'sac_params' in self.params['agent_params']:
+            self.sac_params = self.params['agent_params']['sac_params']
+            self.sac_params['discrete'] = discrete
+            self.sac_params['ac_dim'] = ac_dim
+            self.sac_params['ob_dim'] = ob_dim
+
         # simulation timestep, will be used for video saving
         if 'model' in dir(self.env):
             self.fps = 1/self.env.model.opt.timestep
-        elif 'env_wrappers' in self.params:
-            self.fps = 30 # This is not actually used when using the Monitor wrapper
-        elif 'video.frames_per_second' in self.env.env.metadata.keys():
-            self.fps = self.env.env.metadata['video.frames_per_second']
+        elif 'render_fps' in self.env.env.metadata:
+            self.fps = self.env.env.metadata['render_fps']
         else:
             self.fps = 10
-
 
         #############
         ## AGENT
@@ -128,9 +124,9 @@ class RL_Trainer(object):
 
             # decide if videos should be rendered/logged at this iteration
             if itr % self.params['video_log_freq'] == 0 and self.params['video_log_freq'] != -1:
-                self.logvideo = True
+                self.log_video = True
             else:
-                self.logvideo = False
+                self.log_video = False
 
             # decide if metrics should be logged
             if self.params['scalar_log_freq'] == -1:
@@ -151,8 +147,8 @@ class RL_Trainer(object):
             self.total_envsteps += envsteps_this_batch
 
             # add collected data to replay buffer
-            if isinstance(self.agent, MBAgent):
-                self.agent.add_to_replay_buffer(paths, self.params['add_sl_noise'])
+            if isinstance(self.agent, MBAgent) or isinstance(self.agent, MBPOAgent):
+                self.agent.add_to_replay_buffer(paths, add_sl_noise=self.params['add_sl_noise'])
             else:
                 self.agent.add_to_replay_buffer(paths)
 
@@ -161,12 +157,24 @@ class RL_Trainer(object):
                 print("\nTraining agent...")
             all_logs = self.train_agent()
 
+            # if doing MBPO, train the model free component
+            if isinstance(self.agent, MBPOAgent):
+                for _ in range(self.sac_params['n_iter']):
+                    if self.params['mbpo_rollout_length'] > 0:
+                        # TODO(Q6): Collect trajectory of length self.params['mbpo_rollout_length'] from the 
+                        # learned dynamics model. Add this trajectory to the correct replay buffer.
+                        # HINT: Look at collect_model_trajectory and add_to_replay_buffer from MBPOAgent.
+                        # HINT: Use the from_model argument to ensure the paths are added to the correct buffer.
+                        pass
+                    # train the SAC agent
+                    self.train_sac_agent()
+
             # if there is a model, log model predictions
             if isinstance(self.agent, MBAgent) and itr == 0:
                 self.log_model_predictions(itr, all_logs)
 
             # log/save
-            if self.logvideo or self.logmetrics:
+            if self.log_video or self.logmetrics:
                 # perform logging
                 print('\nBeginning logging procedure...')
                 self.perform_logging(itr, paths, eval_policy, train_video_paths, all_logs)
@@ -188,12 +196,21 @@ class RL_Trainer(object):
             envsteps_this_batch: the sum over the numbers of environment steps in paths
             train_video_paths: paths which also contain videos for visualization purposes
         """
-        # TODO: get this from Piazza
+        # TODO: get this from previous HW
 
         return paths, envsteps_this_batch, train_video_paths
 
     def train_agent(self):
-    # TODO: get this from Piazza
+        # TODO: get this from previous HW
+        pass
+
+    def train_sac_agent(self):
+        # TODO: Train the SAC component of the MBPO agent.
+        # For self.sac_params['num_agent_train_steps_per_iter']:
+        # 1) sample a batch of data of size self.sac_params['train_batch_size'] with self.agent.sample_sac
+        # 2) train the SAC agent self.agent.train_sac
+        # HINT: This will look similar to train_agent above.
+        pass
 
     ####################################
     ####################################
@@ -208,7 +225,7 @@ class RL_Trainer(object):
         eval_paths, eval_envsteps_this_batch = utils.sample_trajectories(self.env, eval_policy, self.params['eval_batch_size'], self.params['ep_len'])
 
         # save eval rollouts as videos in tensorboard event file
-        if self.logvideo and train_video_paths != None:
+        if self.log_video and train_video_paths != None:
             print('\nCollecting video rollouts eval')
             eval_video_paths = utils.sample_n_trajectories(self.env, eval_policy, MAX_NVIDEO, MAX_VIDEO_LEN, True)
 
@@ -280,7 +297,7 @@ class RL_Trainer(object):
         # plot the predictions
         self.fig.clf()
         for i in range(ob_dim):
-            plt.subplot(ob_dim/2, 2, i+1)
+            plt.subplot(ob_dim//2, 2, i+1)
             plt.plot(true_states[:,i], 'g')
             plt.plot(pred_states[:,i], 'r')
         self.fig.suptitle('MPE: ' + str(mpe))

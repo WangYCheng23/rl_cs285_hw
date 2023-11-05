@@ -5,7 +5,7 @@ You can run this code on your own machine or on Google Colab.
 1. **Local option:** If you choose to run locally, you will need to install MuJoCo and some Python packages; see [installation.md](installation.md) for instructions.
 2. **Colab:** The first few sections of the notebook will install all required dependencies. You can try out the Colab option by clicking the badge below:
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2021/blob/master/hw1/cs285/scripts/run_hw1.ipynb)
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2022/blob/master/hw1/cs285/scripts/run_hw1.ipynb)
 
 ## Complete the code
 
@@ -35,8 +35,8 @@ Command for problem 1:
 ```
 python cs285/scripts/run_hw1.py \
 	--expert_policy_file cs285/policies/experts/Ant.pkl \
-	--env_name Ant-v2 --exp_name bc_ant --n_iter 1 \
-	--expert_data cs285/expert_data/expert_data_Ant-v2.pkl
+	--env_name Ant-v4 --exp_name bc_ant --n_iter 1 \
+	--expert_data cs285/expert_data/expert_data_Ant-v4.pkl \
 	--video_log_freq -1
 ```
 
@@ -51,8 +51,8 @@ Command for section 1:
 ```
 python cs285/scripts/run_hw1.py \
     --expert_policy_file cs285/policies/experts/Ant.pkl \
-    --env_name Ant-v2 --exp_name dagger_ant --n_iter 10 \
-    --do_dagger --expert_data cs285/expert_data/expert_data_Ant-v2.pkl \
+    --env_name Ant-v4 --exp_name dagger_ant --n_iter 10 \
+    --do_dagger --expert_data cs285/expert_data/expert_data_Ant-v4.pkl \
 	--video_log_freq -1
 ```
 

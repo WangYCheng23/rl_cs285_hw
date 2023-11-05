@@ -1,4 +1,3 @@
-import os
 import numpy as np
 
 from cs285.infrastructure import pytorch_util as ptu
@@ -6,7 +5,6 @@ from .base_policy import BasePolicy
 from torch import nn
 import torch
 import pickle
-
 
 
 def create_linear_layer(W, b) -> nn.Linear:
@@ -30,11 +28,9 @@ def read_layer(l):
 class LoadedGaussianPolicy(BasePolicy, nn.Module):
     def __init__(self, filename, **kwargs):
         super().__init__(**kwargs)
-        try:
-            with open(os.path.join(os.getcwd(),filename), 'rb') as f:
-                data = pickle.loads(f.read())
-        except:
-            raise FileExistsError('You need to provide a valid filename for the policy')
+
+        with open(filename, 'rb') as f:
+            data = pickle.loads(f.read())
 
         self.nonlin_type = data['nonlin_type']
         if self.nonlin_type == 'lrelu':

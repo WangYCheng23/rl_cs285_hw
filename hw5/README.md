@@ -9,15 +9,19 @@ You can run this code on your own machine or on Google Colab.
 
 RND + CQL:
 
-[![Open In Colab RND + CQL](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2021/blob/master/hw5/run_hw5_expl.ipynb)
+[![Open In Colab RND + CQL](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2022/blob/master/hw5/run_hw5_expl.ipynb)
 
 AWAC:
 
-[![Open In Colab AWAC](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2021/blob/master/hw5/run_hw5_awac.ipynb)
+[![Open In Colab AWAC](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2022/blob/master/hw5/run_hw5_awac.ipynb)
+
+IQL:
+
+[![Open In Colab IQL](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/berkeleydeeprlcourse/homework_fall2022/blob/master/hw5/run_hw5_iql.ipynb)
 
 ## Complete the code
 
-The following files have blanks to be filled with your solutions from homework 1 and 3. The relevant sections are marked with `TODO: get this from Piazza'.
+The following files have blanks to be filled with your solutions from homework 1 and 3. The relevant sections are marked with `TODO'. You can get solutions from Ed. 
 
 - [infrastructure/utils.py](cs285/infrastructure/utils.py)
 - [infrastructure/rl_trainer.py](cs285/infrastructure/rl_trainer.py)
@@ -26,10 +30,19 @@ The following files have blanks to be filled with your solutions from homework 1
 - [critics/dqn_critic.py](cs285/critics/dqn_critic.py)
 
 You will then need to implement code in the following files:
+
+For RND + CQL:
 - [exploration/rnd_model.py](cs285/exploration/rnd_model.py)
 - [agents/explore_or_exploit_agent.py](cs285/agents/explore_or_exploit_agent.py)
-- [agents/awac_agent.py](cs285/agents/awac_agent.py)
 - [critics/cql_critic.py](cs285/critics/cql_critic.py)
+
+For AWAC: 
+- [agents/awac_agent.py](cs285/agents/awac_agent.py)
+
+For IQL:
+- [agents/iql_agent.py](cs285/agents/iql_agent.py)
+- [critics/iql_critic.py](cs285/critics/iql_critic.py)
+
 
 The relevant sections are marked with `TODO`.
 

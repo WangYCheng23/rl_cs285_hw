@@ -3,7 +3,7 @@ import numpy as np
 from gym import spaces
 
 class Obstacles(gym.Env):
-    def __init__(self, start=[-0.5, 0.75], end=[0.7, -0.8], random_starts=True):
+    def __init__(self, start=[-0.5, 0.75], end=[0.7, -0.8], random_starts=True, **kwargs):
 
         import matplotlib.pyplot as plt #inside, so doesnt get imported when not using this env
         self.plt = plt
@@ -187,9 +187,9 @@ class Obstacles(gym.Env):
         self.plt.plot(self.end[0], self.end[1], 'go')
         self.plt.plot(self.current[0], self.current[1], 'ko')
         self.fig.canvas.draw()
-        img = np.fromstring(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
+        img = np.frombuffer(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
         img = img.reshape(self.fig.canvas.get_width_height()[::-1] + (3,))
-        return img
+        return [img]
 
     def is_valid(self, dat):
 

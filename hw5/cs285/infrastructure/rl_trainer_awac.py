@@ -10,11 +10,13 @@ from gym import wrappers
 import numpy as np
 import torch
 from cs285.infrastructure import pytorch_util as ptu
+from cs285.infrastructure.atari_wrappers import ReturnWrapper
 
 from cs285.infrastructure import utils
 from cs285.infrastructure.logger import Logger
 
 from cs285.agents.awac_agent import AWACAgent
+from cs285.agents.iql_agent import IQLAgent
 from cs285.infrastructure.dqn_utils import (
         get_wrapper_by_name,
         register_custom_envs,
@@ -62,18 +64,29 @@ class RL_Trainer(object):
             matplotlib.use('Agg')
             self.env.set_logdir(self.params['logdir'] + '/expl_')
             self.eval_env.set_logdir(self.params['logdir'] + '/eval_')
-            
+
+        if self.params['video_log_freq'] > 0:
+            self.episode_trigger = lambda episode: episode % self.params['video_log_freq'] == 0
+        else:
+            self.episode_trigger = lambda episode: False
+
         if 'env_wrappers' in self.params:
             # These operations are currently only for Atari envs
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), force=True)
-            self.eval_env = wrappers.Monitor(self.eval_env, os.path.join(self.params['logdir'], "gym"), force=True)
+            self.env = wrappers.RecordEpisodeStatistics(self.env, deque_size=1000)
+            self.env = ReturnWrapper(self.env)
+            self.env = wrappers.RecordVideo(self.env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
             self.env = params['env_wrappers'](self.env)
+
+            self.eval_env = wrappers.RecordEpisodeStatistics(self.eval_env, deque_size=1000)
+            self.eval_env = ReturnWrapper(self.eval_env)
+            self.eval_env = wrappers.RecordVideo(self.eval_env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
             self.eval_env = params['env_wrappers'](self.eval_env)
+
             self.mean_episode_reward = -float('nan')
             self.best_mean_episode_reward = -float('inf')
         if 'non_atari_colab_env' in self.params and self.params['video_log_freq'] > 0:
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), write_upon_reset=True)#, force=True)
-            self.eval_env = wrappers.Monitor(self.eval_env, os.path.join(self.params['logdir'], "gym"), write_upon_reset=True)
+            self.env = wrappers.RecordVideo(self.env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
+            self.eval_env = wrappers.RecordVideo(self.eval_env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
             self.mean_episode_reward = -float('nan')
             self.best_mean_episode_reward = -float('inf')
         self.env.seed(seed)
@@ -134,7 +147,7 @@ class RL_Trainer(object):
         self.total_envsteps = 0
         self.start_time = time.time()
 
-        print_period = 1000 if isinstance(self.agent, AWACAgent) else 1
+        print_period = 1000 if (isinstance(self.agent, AWACAgent) or isinstance(self.agent, IQLAgent)) else 1
 
         for itr in range(n_iter):
             if itr % print_period == 0:
@@ -155,7 +168,7 @@ class RL_Trainer(object):
                 self.logmetrics = False
 
             # collect trajectories, to be used for training
-            if isinstance(self.agent, AWACAgent):
+            if isinstance(self.agent, AWACAgent) or isinstance(self.agent, IQLAgent):
                 self.agent.step_env()
                 envsteps_this_batch = 1
                 train_video_paths = None
@@ -178,7 +191,7 @@ class RL_Trainer(object):
                 paths = self.do_relabel_with_expert(expert_policy, paths)
 
             # add collected data to replay buffer
-            if isinstance(self.agent, AWACAgent):
+            if isinstance(self.agent, AWACAgent) or isinstance(self.agent, IQLAgent):
                 if (not self.agent.offline_exploitation) or (self.agent.t <= self.agent.num_exploration_steps):
                     self.agent.add_to_replay_buffer(paths)
 
@@ -188,14 +201,14 @@ class RL_Trainer(object):
             all_logs = self.train_agent()
 
             # Log densities and output trajectories
-            if isinstance(self.agent, AWACAgent) and (itr % print_period == 0):
+            if (isinstance(self.agent, AWACAgent) or isinstance(self.agent, IQLAgent)) and (itr % print_period == 0):
                 self.dump_density_graphs(itr)
 
             # log/save
             if self.logvideo or self.logmetrics:
                 # perform logging
                 print('\nBeginning logging procedure...')
-                if isinstance(self.agent, AWACAgent):
+                if isinstance(self.agent, AWACAgent) or isinstance(self.agent, IQLAgent):
                     self.perform_dqn_logging(all_logs)
                 else:
                     self.perform_logging(itr, paths, eval_policy, train_video_paths, all_logs)
@@ -261,7 +274,7 @@ class RL_Trainer(object):
     def perform_dqn_logging(self, all_logs):
         last_log = all_logs[-1]
 
-        episode_rewards = get_wrapper_by_name(self.env, "Monitor").get_episode_rewards()
+        episode_rewards = self.env.get_episode_rewards()
         if len(episode_rewards) > 0:
             self.mean_episode_reward = np.mean(episode_rewards[-100:])
         if len(episode_rewards) > 100:

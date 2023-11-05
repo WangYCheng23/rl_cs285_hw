@@ -322,7 +322,7 @@ class Pointmass(gym.Env):
     self.observation_space = gym.spaces.Box(
         low=np.array([0,0]),
         high=np.array([self._height, self._width]),
-        dtype=np.float32)
+        dtype=np.float64)
 
     self.dense_reward = dense_reward
     self.num_actions = 5

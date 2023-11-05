@@ -1,7 +1,6 @@
 import numpy as np
 from gym import utils
 from gym.envs.mujoco import mujoco_env
-from mujoco_py import MjViewer
 import os
 
 class Reacher7DOFEnv(mujoco_env.MujocoEnv, utils.EzPickle):

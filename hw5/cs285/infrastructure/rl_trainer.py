@@ -10,6 +10,7 @@ from gym import wrappers
 import numpy as np
 import torch
 from cs285.infrastructure import pytorch_util as ptu
+from cs285.infrastructure.atari_wrappers import ReturnWrapper
 
 from cs285.infrastructure import utils
 from cs285.infrastructure.logger import Logger
@@ -62,18 +63,30 @@ class RL_Trainer(object):
             matplotlib.use('Agg')
             self.env.set_logdir(self.params['logdir'] + '/expl_')
             self.eval_env.set_logdir(self.params['logdir'] + '/eval_')
+
+        if self.params['video_log_freq'] > 0:
+            self.episode_trigger = lambda episode: episode % self.params['video_log_freq'] == 0
+        else:
+            self.episode_trigger = lambda episode: False
             
         if 'env_wrappers' in self.params:
             # These operations are currently only for Atari envs
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), force=True)
-            self.eval_env = wrappers.Monitor(self.eval_env, os.path.join(self.params['logdir'], "gym"), force=True)
+            self.env = wrappers.RecordEpisodeStatistics(self.env, deque_size=1000)
+            self.env = ReturnWrapper(self.env)
+            self.env = wrappers.RecordVideo(self.env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
             self.env = params['env_wrappers'](self.env)
+
+            self.eval_env = wrappers.RecordEpisodeStatistics(self.eval_env, deque_size=1000)
+            self.eval_env = ReturnWrapper(self.eval_env)
+            self.eval_env = wrappers.RecordVideo(self.eval_env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
             self.eval_env = params['env_wrappers'](self.eval_env)
+
             self.mean_episode_reward = -float('nan')
             self.best_mean_episode_reward = -float('inf')
         if 'non_atari_colab_env' in self.params and self.params['video_log_freq'] > 0:
-            self.env = wrappers.Monitor(self.env, os.path.join(self.params['logdir'], "gym"), write_upon_reset=True)#, force=True)
-            self.eval_env = wrappers.Monitor(self.eval_env, os.path.join(self.params['logdir'], "gym"), write_upon_reset=True)
+            self.env = wrappers.RecordVideo(self.env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
+            self.eval_env = wrappers.RecordVideo(self.eval_env, os.path.join(self.params['logdir'], "gym"), episode_trigger=self.episode_trigger)
+
             self.mean_episode_reward = -float('nan')
             self.best_mean_episode_reward = -float('inf')
         self.env.seed(seed)
@@ -261,7 +274,7 @@ class RL_Trainer(object):
     def perform_dqn_logging(self, all_logs):
         last_log = all_logs[-1]
 
-        episode_rewards = get_wrapper_by_name(self.env, "Monitor").get_episode_rewards()
+        episode_rewards = self.env.get_episode_rewards()
         if len(episode_rewards) > 0:
             self.mean_episode_reward = np.mean(episode_rewards[-100:])
         if len(episode_rewards) > 100:
