@@ -94,8 +94,8 @@ class MLPPolicy(BasePolicy, nn.Module, metaclass=abc.ABCMeta):
 
         # [Solved] return the action that the policy prescribes
         distributions = self.forward(ptu.from_numpy(observation.astype(np.float32)))
-        action = distributions.sample()
-        return ptu.to_numpy(action)
+        action = ptu.to_numpy(distributions.sample())
+        return action
     
     # update/train this policy
     def update(self, observations, actions, **kwargs):
@@ -136,7 +136,7 @@ class MLPPolicyPG(MLPPolicy):
         actions = ptu.from_numpy(actions)
         advantages = ptu.from_numpy(advantages)
 
-        # TODO: update the policy using policy gradient
+        # [Solved] update the policy using policy gradient
         # HINT1: Recall that the expression that we want to MAXIMIZE
             # is the expectation over collected trajectories of:
             # sum_{t=0}^{T-1} [grad [log pi(a_t|s_t) * (Q_t - b_t)]]
@@ -151,7 +151,7 @@ class MLPPolicyPG(MLPPolicy):
         self.optimizer.step()
         
         if self.nn_baseline:
-            ## TODO: update the neural network baseline using the q_values as
+            ## [Solved] update the neural network baseline using the q_values as
             ## targets. The q_values should first be normalized to have a mean
             ## of zero and a standard deviation of one.
 

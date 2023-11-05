@@ -1,10 +1,17 @@
-import os
+import os,sys
 import time
+
+root_path = os.path.abspath(__file__)
+root_path = '/'.join(root_path.split('/')[:-3])
+sys.path.insert(0, root_path)
+
 
 from cs285.infrastructure.rl_trainer import RL_Trainer
 from cs285.agents.dqn_agent import DQNAgent
 from cs285.infrastructure.dqn_utils import get_env_kwargs
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 class Q_Trainer(object):
 

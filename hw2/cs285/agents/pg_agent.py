@@ -40,7 +40,7 @@ class PGAgent(BaseAgent):
             and the calculated qvals/advantages that come from the seen rewards.
         """
 
-        # TODO: update the PG actor/policy using the given batch of data 
+        # [Solved] update the PG actor/policy using the given batch of data 
         # using helper functions to compute qvals and advantages, and
         # return the train_log obtained from updating the policy
         qvals = self.calculate_q_vals(rewards_list)
@@ -55,7 +55,7 @@ class PGAgent(BaseAgent):
             Monte Carlo estimation of the Q function.
         """
 
-        # TODO: return the estimated qvals based on the given rewards, using
+        # [Solved] return the estimated qvals based on the given rewards, using
             # either the full trajectory-based estimator or the reward-to-go
             # estimator
 
