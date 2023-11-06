@@ -5,6 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "hw3-dqn-family",
+            "type": "python",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/hw3/",
+            "program": "${workspaceFolder}/hw3/cs285/scripts/run_hw3_dqn.py",
+            "args": [
+                // // basic  Q-learning  performance  (DQN)
+                // "--env_name", "MsPacman-v0", "--exp_name", "q1"
+
+                // double Q-learning (DDQN)
+                "--env_name", "LunarLander-v3", "--exp_name", "q2_dqn_1", "--seed", "1"
+            ]
+        },
+        {
             "name": "hw2-PG",
             "type": "python",
             "request": "launch",
